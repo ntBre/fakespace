@@ -14,18 +14,19 @@ import (
 )
 
 var (
-	YMAX    = flag.Int("y", 500, "height of image in pixels")
-	XMAX    = int(math.Round(3.25/1.75)) * *YMAX
+	YMAX = flag.Int("y", 500, "height of image in pixels")
+	XMAX = flag.Int("x", int(math.Round(3.25/1.75))**YMAX,
+		"width of image in pixels; defaults to ratio for JPCA TOC graphic")
 	RED_MAX = flag.Int("red", 10, "number of large red stars")
 	BLU_MAX = flag.Int("blue", 10, "number of large blue stars")
 	rad     = flag.Int("size", 2, "radius of large stars in pixels")
 )
 
 func AddStar(img *image.NRGBA, col color.NRGBA) {
-	rxl, _ := crypt.Int(crypt.Reader, big.NewInt(int64(XMAX)))
+	rxl, _ := crypt.Int(crypt.Reader, big.NewInt(int64(*XMAX)))
 	ryl, _ := crypt.Int(crypt.Reader, big.NewInt(int64(*YMAX)))
 	x, y := int(rxl.Int64()), int(ryl.Int64())
-	for rx := x - *rad; rx <= x+*rad && rx <= XMAX; rx++ {
+	for rx := x - *rad; rx <= x+*rad && rx <= *XMAX; rx++ {
 		for ry := y - *rad; ry <= y+*rad && ry <= *YMAX; ry++ {
 			yy := ry - y
 			xx := rx - x
@@ -43,12 +44,12 @@ func main() {
 		panic("not enough arguments")
 	}
 	rand.Seed(int64(time.Now().Nanosecond()))
-	img := image.NewNRGBA(image.Rect(0, 0, XMAX, *YMAX))
+	img := image.NewNRGBA(image.Rect(0, 0, *XMAX, *YMAX))
 	f, err := os.Create(args[0])
 	if err != nil {
 		panic(err)
 	}
-	for x := 0; x <= XMAX; x++ {
+	for x := 0; x <= *XMAX; x++ {
 		for y := 0; y <= *YMAX; y++ {
 			r := rand.Float64()
 			if r < 0.004 {
