@@ -16,21 +16,22 @@ import (
 var (
 	YMAX = flag.Int("y", 500, "height of image in pixels")
 	XMAX = flag.Int("x", int(math.Round(3.25/1.75))**YMAX,
-		"width of image in pixels; defaults to ratio for JPCA TOC graphic")
+		"width of image in pixels")
 	RED_MAX = flag.Int("red", 10, "number of large red stars")
 	BLU_MAX = flag.Int("blue", 10, "number of large blue stars")
-	rad     = flag.Int("size", 2, "radius of large stars in pixels")
+	RAD     = flag.Int("size", 2, "radius of large stars in pixels")
+	RATE    = flag.Float64("rate", 0.004, "rate of white stars")
 )
 
 func AddStar(img *image.NRGBA, col color.NRGBA) {
 	rxl, _ := crypt.Int(crypt.Reader, big.NewInt(int64(*XMAX)))
 	ryl, _ := crypt.Int(crypt.Reader, big.NewInt(int64(*YMAX)))
 	x, y := int(rxl.Int64()), int(ryl.Int64())
-	for rx := x - *rad; rx <= x+*rad && rx <= *XMAX; rx++ {
-		for ry := y - *rad; ry <= y+*rad && ry <= *YMAX; ry++ {
+	for rx := x - *RAD; rx <= x+*RAD && rx <= *XMAX; rx++ {
+		for ry := y - *RAD; ry <= y+*RAD && ry <= *YMAX; ry++ {
 			yy := ry - y
 			xx := rx - x
-			if *rad**rad >= xx*xx+yy*yy {
+			if *RAD**RAD >= xx*xx+yy*yy {
 				img.Set(rx, ry, col)
 			}
 		}
@@ -52,7 +53,7 @@ func main() {
 	for x := 0; x <= *XMAX; x++ {
 		for y := 0; y <= *YMAX; y++ {
 			r := rand.Float64()
-			if r < 0.004 {
+			if r < *RATE {
 				img.Set(x, y, color.NRGBA{255, 255, 255, 255})
 			} else {
 				img.Set(x, y, color.NRGBA{0, 0, 0, 255})
