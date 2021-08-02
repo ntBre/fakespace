@@ -1,3 +1,6 @@
+install:
+	go install .
+
 logo:
 	go run . img/logo.png
 	mogrify -gravity center -pointsize 96 -fill yellow \
